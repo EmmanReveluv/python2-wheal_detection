@@ -35,6 +35,8 @@ maxDiameter.set("Max Diameter: ")
 area.set("Area: ")
 result.set("SVM Result: ")
 
+MAIN_DIRECTORY='./'
+
 def testCamera():
         camera = picamera.PiCamera()
         tkMessageBox.showinfo("Notice", "CTRL+D to stop preview")
@@ -52,49 +54,10 @@ def cannyEdge():
         edged = cv2.Canny(gray, 20, 50)
         cv2.imwrite('cannyEdged.jpg',edged)
 
-def redColor():
-        # Copy
-        image = cv2.imread('sample.jpg')
-        image= cv2.cvtColor(image, cv2.COLOR_BGR2GRAY);
-        #input, gives all the contours, contour approximation compresses horizontal,
-        #vertical, and diagonal segments and leaves only their end points. For example,
-        #an up-right rectangular contour is encoded with 4 points.
-        #Optional output vector, containing information about the image topology.
-        #It has as many elements as the number of contours.
-        #we dont need it
-        _, contours, hierarchy = cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-
-        # Isolate largest contour
-        contour_sizes = [(cv2.contourArea(contour), contour) for contour in contours]
-        biggest_contour = max(contour_sizes, key=lambda x: x[0])[1]
-
-        mask = np.zeros(image.shape, np.uint8)
-        cv2.drawContours(mask, [biggest_contour], -1, 255, -1)
-        cv2.imwrite('cont.jpg',biggest_contour)
-        cv2.imwrite('mask.jpg',mask)
-        
-        
-
 def imageProcess():
 
         try:
                 img = cv2.imread('cropped.jpg',0)
-
-                #crop_img = cv2.imread('Quintos_Orig.jpg')
-                #UNCOMMENT TO CROP OF PAST PICTURE
-                #x1=450   #first x value
-                #x2=2400 #last x value
-                #y1=1150  #first y value
-                #y2=1750 #last y value
-                #img = img[ y1:y2,x1:x2] #crop pic
-                #i-uncomment mo isa dito sa 1 line sa taas
-                #or dito sa 2 line sa baba
-                #cropimg = crop_img[ y1:y2,x1:x2]
-                #img=img_crop
-
-                #cv2.imwrite('cropped.jpg',cropimg)
-                #os.system('sudo cp cropped.jpg /var/www/html/cropped.jpg')
-
                 img = cv2.medianBlur(img,3)
                 cv2.imwrite('medianimg.jpg',img)
                 os.system('sudo cp medianimg.jpg /var/www/html/medianimg.jpg') 
@@ -107,11 +70,6 @@ def imageProcess():
                 
                 output = img.copy()
 
-                #output = cv2.imread('cropped.jpg')
-                #also uncomment this
-                #output = output[ y1:y2,x1:x2] #crop pic
-##                crop_output = output[ y1:y2,x1:x2]
-##                output=crop_output
                 circles = cv2.HoughCircles(img,cv2.cv.CV_HOUGH_GRADIENT,1.25,45,
                                          param1=40,param2=26,minRadius=0,maxRadius=90)
                 
@@ -212,8 +170,6 @@ def svm(severity,diameter):
 
         ############PREDICT VALUE################
 
-
-
 def takePicture():
         GPIO.output(26,GPIO.HIGH)
         GPIO.output(16,GPIO.HIGH)
@@ -259,7 +215,6 @@ def manualSVM():
 #buttons and labels
 btnPicture = Button(top, text="Take Picture", command=takePicture, font=("piboto", 12))
 btnStart = Button(top,text="Start Analysis",command=imageProcess, font=("piboto", 12))
-#btnMan = Button(top,text="Manual SVM",command=manualSVM, font=("piboto", 8))
 lblDia = Label( top, textvariable=maxDiameter,font=("piboto", 12))
 lblArea = Label(top, textvariable=area,font=("piboto", 12))
 lblRes = Label(top, textvariable=result,font=("piboto", 12))
@@ -267,17 +222,6 @@ lblneg = Label(top, text="[0] = Negative",font=("piboto", 8))
 lblmod = Label(top, text="[1] = moderately sensitive",font=("piboto", 8))
 lblmil = Label(top, text="[2] = midly sensitive",font=("piboto", 8))
 lblver = Label(top, text="[3] = very sensitive",font=("piboto", 8))
-#lblMan = Label(top, text="Manual SVM",font=("piboto", 8))
-#entDiam = Entry(top)
-#entAmount = Entry(top)
-#entDiam.insert(0,'Diameter')
-#entDiam.bind("<FocusIn>", lambda args: entDiam.delete('0', 'end'))
-#entAmount.insert(0,'Amount')
-#entAmount.bind("<FocusIn>", lambda args: entAmount.delete('0', 'end'))
-#btnMan.place(x=370,y=30)
-#lblMan.place(x=195,y=10)
-#entDiam.place(x=200,y=30)
-#entAmount.place(x=200,y=60)
 btnPicture.place(x=50,y=25)
 btnStart.place(x=50,y=75)
 lblDia.place(x=50,y=125)
